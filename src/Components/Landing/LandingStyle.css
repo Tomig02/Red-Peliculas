@@ -8,11 +8,8 @@
     display: flex;
 }
 
-.center{
-    display: flex;
+.column{
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
 }
 .text{
     font-family: "Recoleta";
@@ -28,14 +25,6 @@
 .text h2{
     font-size: 2.5em;
     color: white;
-    margin: 10px 30px;
-}
-form{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-    height: 200px;
 }
 input{
     margin-bottom: 10px;

@@ -1,19 +1,22 @@
 import React from "react";
-import TextField from '@material-ui/core/TextField';
-import Button from "@material-ui/core/Button"
-import {useField, Formik, Field, Form} from "formik";
-import * as Yup from "yup";
+import {Grid, Paper} from "@material-ui/core"
+
+import RegisterForm from "./RegisterForm";
 
 function Register(){
     return(
-        <div>
-            <h2>title</h2>
-            <Formik>
-                <Form>
-                    <TextField></TextField>
-                    <Button></Button>
-                </Form>
-            </Formik>           
+        <div className="center">
+            <Paper className="paper center">
+                <Grid container spacing={3} direction="column" className="center">
+                    <Grid item xs={12} className="text">
+                        <h2 style={{color: '#FF6565'}}>Register</h2>
+                        <h3>start sharing now</h3>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <RegisterForm/>
+                    </Grid>
+                </Grid>
+            </Paper>
         </div>
     );
 }

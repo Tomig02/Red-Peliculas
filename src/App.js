@@ -9,19 +9,16 @@ import Register from "./Components/Register/Register"
 
 function App() {
 
-    const [userInfo, setUserInfo] = useState({
-        userName: "",
-        name: "",
-        surname: "",
-        birthday:{
-            day: "",
-            month: "",
-            year: ""
-        }
-    });
+    const [userInfo, setUserInfo] = useState({});
+    const [isUser, setIsUser] = useState(false);
+
+    //save user data and admit login route
     const logInUser = (fetchData) => {
+        setUserInfo(fetchData);
+        setIsUser(true);
         console.log(fetchData);
     }
+
     const LandingPage = () => <Landing logInUser={logInUser}/>
     return (
         <ThemeProvider theme={Theme}>
