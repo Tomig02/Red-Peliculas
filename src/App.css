@@ -1,0 +1,18 @@
+@font-face{
+    font-family: "Recoleta";
+    src: url("./Fonts/Recoleta-Bold.ttf");
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; 
+}
+.center{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.paper{
+    padding: 1em;
+}
