@@ -21,36 +21,74 @@ const MyTextInput = (props) => {
 
 const MyBulletInput = (props) => {
     const [field, meta] = useField(props);
-    
+    const errorText = meta.error && meta.touched? meta.error : "";
     return(
         <FormControlLabel 
             {...field} 
             control={<Radio color="primary"/>} 
-            label={props.label}    
+            label={props.label}
+            helperText={errorText} 
+            error={!!errorText}  
         />
     );
 }
 
 const MySelectInput = (props) => {
+    const[field, meta] = useField(props);
+    const errorText = meta.error && meta.touched? meta.error : "";
+    
     let array=[];
     for (var i = 0; i < props.options && i < 100; i++) {
         array.push({num: props.options - i, key: Math.random()});
         
     }
-    const elements = array.map( data => (
-        <MenuItem key={data.key} value={data.num} > {data.num} </MenuItem>
-    ))
     return(
-        <Select variant="outlined" style={{width:"100%"}}>
-            {elements}
-        </Select>
+        <Select {...field} 
+            
+            variant="outlined" 
+            style={{width:"100%"}}
+        >{   
+            array.map( data => (
+            <MenuItem key={data.key} value={data.num} > {data.num} </MenuItem>
+        ))}</Select>
     );
 }
 
+const validationSchema = Yup.object().shape({
+
+    nombre: Yup.string()
+        .required("Name is required"),
+
+    apellido: Yup.string()
+        .required("Surname is required"),
+
+    email: Yup.string()
+        .required("Email is required")
+        .email("Not a valid email"),
+
+    gender: Yup.string()
+        .required("Gender is required"),
+
+    birth: Yup.object().shape({
+        day: Yup.string()
+            .required("Gender is required"),
+        month:  Yup.string()
+            .required("Gender is required"),
+        year:   Yup.string()
+            .required("Gender is required"),
+    })
+})
 function RegisterForm(){
     return(
         <Formik
-            initialValues = { {nombre:"", apellido:"", email:"", gender:""} }
+            initialValues = {{
+                nombre:"", 
+                apellido:"", 
+                email:"", 
+                gender:"male", 
+                age:"18"
+            }}
+            validationSchema = {validationSchema}
             onSubmit = { ((values, actions) => {
                 actions.setSubmitting(true);
                 actions.setSubmitting(false)
@@ -84,44 +122,41 @@ function RegisterForm(){
                             label="E-Mail"
                         />
                     </Grid>
-                    <Grid item xs={12} container spacing={0}>
-                        <Grid item xs={4}>
-                            <MySelectInput 
-                                name="day" 
-                                options={31}/>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <MySelectInput 
-                                name="month"
-                                options={12}/>
-                        </Grid>
-                        <Grid item xs={4}>
+
+                    
+                    <Grid item xs={12} container spacing={2}>
+                        <Grid item xs={3}>
+                            <div className="text">Age:</div>
                             <MySelectInput
-                                name="year" 
-                                options={2021}
+                                name="age"
+                                options={100}
+                            />
+                        </Grid>
+                        <Grid item xs={9}>
+                            <div className="text">Gender:</div>
+                            <MyBulletInput 
+                                name="gender"
+                                label="Female"
+                                type="radio"
+                                value="female"
+                            />
+                            <MyBulletInput 
+                                name="gender"
+                                label="Male"
+                                type="radio"
+                                value="male"                        
+                            />
+                            <MyBulletInput 
+                                name="gender"
+                                type="radio"
+                                label="Other"
+                                value="other"
                             />
                         </Grid>
                     </Grid>
-                    <Grid item xs={12}>
-                        <MyBulletInput 
-                            name="gender"
-                            label="Female"
-                            type="radio"
-                            value="female"
-                        />
-                        <MyBulletInput 
-                            name="gender"
-                            label="Male"
-                            type="radio"
-                            value="male"                        
-                        />
-                        <MyBulletInput 
-                            name="gender"
-                            type="radio"
-                            label="Other"
-                            value="other"
-                        />
-                    </Grid>
+
+                    
+                    
                     <Grid item xs={12} className="center">
                         <Button 
                             type="submit" 

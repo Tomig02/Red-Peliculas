@@ -26,6 +26,7 @@ function App() {
                 <Switch>
                     <Route path="/" exact component={LandingPage}/>
                     <Route path="/register" component={Register}/>
+                    <Route path="/Inside" component={Register}/>
                 </Switch>
             </Router>
         </ThemeProvider>

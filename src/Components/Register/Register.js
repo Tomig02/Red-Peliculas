@@ -5,7 +5,7 @@ import RegisterForm from "./RegisterForm";
 
 function Register(){
     return(
-        <div className="center">
+        <div className="background center">
             <Paper className="paper center">
                 <Grid container spacing={3} direction="column" className="center">
                     <Grid item xs={12} className="text">
