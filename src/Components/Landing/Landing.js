@@ -10,7 +10,7 @@ function Landing(props){
 
     // check if input data is a valid user by comparing it with fetched data
     const handleUser = (userData, fetchData) =>{
-        if (userData.userName === fetchData.name && userData.password === fetchData.height){
+        if (userData.userName === fetchData.username && userData.password === fetchData.password){
             props.logInUser(fetchData);
         }
         else{

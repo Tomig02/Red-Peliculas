@@ -5,11 +5,11 @@ import * as Yup from "yup";
 
 // simple required fields, probalby needs more robust check
 const validationSchema = Yup.object().shape({
-    userName: Yup.string()
+    username: Yup.string()
         .required("invalid user"),
     password: Yup.string()
         .required("invalid password")
-        .min(8, "At least 8 characters")
+        //.min(8, "At least 8 characters")
 });
 
 // made a custom M-UI text field for easier error message
@@ -22,23 +22,30 @@ const MyTextInput = (props) => {
 function LandingForm(props){
     return(
         <Formik 
-            initialValues={{userName:"", password:""}}
-            onSubmit={((data, actions) =>{
+            initialValues={{username:"", password:""}}
+            onSubmit={( async (data, actions) =>{
                 actions.setSubmitting(true);
                 // start fetch user data
+
+                var myHeaders = new Headers();
+                myHeaders.append('Content-Type', 'application/json');
+
+                const requestOptions = {
+                    method: 'POST',
+                    headers: myHeaders,
+                    body: JSON.stringify(data)
+                };
                 try{
-                    fetch('https://swapi.dev/api/people/1/')
-                        .then( response => {
-                            if(!response.ok) {
-                                throw Error(response.statusText)
-                            } else return response.json()
-                        })
-                        .then( fetchedData => {
-                            props.handleUser(data, fetchedData);
-                        })
-                } catch(error){
-                    alert("error");
-                } finally{
+                    const response = await fetch('http://localhost:3000/login', requestOptions);
+                    if(!response.ok) throw Error(response.statusText)
+                    const content = await response.json();
+
+                    console.log(content);
+                }
+                catch(err){
+                    console.log(err.message)
+                }
+                finally{
                     actions.setSubmitting(false);
                 }
                 // end fetch user data
@@ -50,7 +57,7 @@ function LandingForm(props){
                     <Grid container spacing={2} direction="column" className="center">
                         <Grid item xs={12}>
                             <MyTextInput
-                                name="userName" 
+                                name="username" 
                                 type="input" 
                                 variant="outlined" 
                                 label="User Name"

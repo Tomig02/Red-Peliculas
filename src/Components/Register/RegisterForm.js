@@ -20,31 +20,26 @@ const MyTextInput = (props) => {
 }
 
 const MyBulletInput = (props) => {
-    const [field, meta] = useField(props);
-    const errorText = meta.error && meta.touched? meta.error : "";
+    const [field] = useField(props);
     return(
         <FormControlLabel 
             {...field} 
             control={<Radio color="primary"/>} 
             label={props.label}
-            helperText={errorText} 
-            error={!!errorText}  
         />
     );
 }
 
 const MySelectInput = (props) => {
-    const[field, meta] = useField(props);
-    const errorText = meta.error && meta.touched? meta.error : "";
-    
-    let array=[];
+    const [field] = useField(props);
+
+    const array=[];
     for (var i = 0; i < props.options && i < 100; i++) {
         array.push({num: props.options - i, key: Math.random()});
-        
     }
+
     return(
         <Select {...field} 
-            
             variant="outlined" 
             style={{width:"100%"}}
         >{   
@@ -56,63 +51,81 @@ const MySelectInput = (props) => {
 
 const validationSchema = Yup.object().shape({
 
-    nombre: Yup.string()
+    name: Yup.string()
         .required("Name is required"),
 
-    apellido: Yup.string()
+    surname: Yup.string()
         .required("Surname is required"),
-
+    username: Yup.string()
+        .required("Username is required"),
     email: Yup.string()
         .required("Email is required")
-        .email("Not a valid email"),
-
-    gender: Yup.string()
-        .required("Gender is required"),
-
-    birth: Yup.object().shape({
-        day: Yup.string()
-            .required("Gender is required"),
-        month:  Yup.string()
-            .required("Gender is required"),
-        year:   Yup.string()
-            .required("Gender is required"),
-    })
+        .email("Not a valid email")
 })
 function RegisterForm(){
     return(
         <Formik
             initialValues = {{
-                nombre:"", 
-                apellido:"", 
-                email:"", 
-                gender:"male", 
-                age:"18"
+                username: "",
+                password: "",
+                name: "", 
+                surname: "",
+                
+                email: "", 
+                gender: "male", 
+                age: "18"
             }}
             validationSchema = {validationSchema}
-            onSubmit = { ((values, actions) => {
+            onSubmit = { async (values, actions) => {
+                
                 actions.setSubmitting(true);
-                actions.setSubmitting(false)
-            }) }
+
+                const myHeaders = new Headers();
+                myHeaders.append('Content-Type', 'application/json');
+                const sendData = {
+                    method: "POST",
+                    headers: myHeaders,
+                    body: JSON.stringify(values)
+                };
+                try{
+                    await fetch('http://localhost:3000/register', sendData);
+                    console.log("done");
+                }
+                catch(err){
+                    console.log(err.message);
+                }
+                finally{
+                    actions.setSubmitting(false);
+                }
+            } }
         >{(values, isSubmitting) => (
             <Form>
                 <Grid container spacing={2} direction="column" className="center">
                     <Grid item container spacing={2} className="center">
                         <Grid item xs={6}>
                             <MyTextInput
-                                name="nombre" 
+                                name="name" 
                                 type="text" 
                                 variant="outlined" 
-                                label="Nombre"
+                                label="Name"
                             />
                         </Grid>
                         <Grid item xs={6}>
                             <MyTextInput
-                                name="apellido" 
+                                name="surname" 
                                 type="text" 
                                 variant="outlined" 
-                                label="Apellido"
+                                label="Surname"
                             />
                         </Grid>
+                    </Grid>
+                    <Grid style={{width:"100%"}} item xs={12}>
+                        <MyTextInput
+                            name="username" 
+                            type="text" 
+                            variant="outlined" 
+                            label="Username"
+                        />
                     </Grid>
                     <Grid style={{width:"100%"}} item xs={12}>
                         <MyTextInput
@@ -122,8 +135,14 @@ function RegisterForm(){
                             label="E-Mail"
                         />
                     </Grid>
-
-                    
+                    <Grid style={{width:"100%"}} item xs={12}>
+                        <MyTextInput
+                            name="password" 
+                            type="password" 
+                            variant="outlined" 
+                            label="Password"
+                        />
+                    </Grid>
                     <Grid item xs={12} container spacing={2}>
                         <Grid item xs={3}>
                             <div className="text">Age:</div>
@@ -154,16 +173,13 @@ function RegisterForm(){
                             />
                         </Grid>
                     </Grid>
-
-                    
-                    
                     <Grid item xs={12} className="center">
                         <Button 
                             type="submit" 
                             variant="contained" 
                             color="primary"
                             disabled={isSubmitting}
-                        >Submit</Button>
+                        >REGISTRARSE</Button>
                     </Grid>
                 </Grid>
             </Form>

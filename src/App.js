@@ -14,6 +14,7 @@ function App() {
 
     //save user data and admit login route
     const logInUser = (fetchData) => {
+        console.log("hello");
         setUserInfo(fetchData);
         setIsUser(true);
         console.log(fetchData);
