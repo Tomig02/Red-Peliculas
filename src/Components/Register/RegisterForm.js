@@ -2,6 +2,7 @@ import React from "react";
 import {TextField, Button, FormControlLabel, Radio, Grid, Select, MenuItem} from '@material-ui/core';
 import {useField, Formik, Form} from "formik";
 import * as Yup from "yup";
+import {useHistory} from "react-router-dom";
 
 const MyTextInput = (props) => {
     const[field, meta] = useField(props);
@@ -9,13 +10,14 @@ const MyTextInput = (props) => {
     return (
         <TextField 
             {...field}
-            type={props.type} 
-            label={props.label} 
-            variant={props.variant} 
-            helperText={errorText} 
-            error={!!errorText}
-            color="primary"
-            style={{width:"100%"}}
+            type = {props.type} 
+            label = {props.label} 
+            variant = {props.variant}
+            size = "small"
+            helperText = {errorText} 
+            error = {!!errorText}
+            color = "primary"
+            style = {{width:"100%"}}
         />);
 }
 
@@ -24,8 +26,8 @@ const MyBulletInput = (props) => {
     return(
         <FormControlLabel 
             {...field} 
-            control={<Radio color="primary"/>} 
-            label={props.label}
+            control = {<Radio color="primary"/>} 
+            label = {props.label}
         />
     );
 }
@@ -40,11 +42,11 @@ const MySelectInput = (props) => {
 
     return(
         <Select {...field} 
-            variant="outlined" 
-            style={{width:"100%"}}
+            variant = "outlined" 
+            style = {{width:"100%"}}
         >{   
             array.map( data => (
-            <MenuItem key={data.key} value={data.num} > {data.num} </MenuItem>
+            <MenuItem key = {data.key} value = {data.num} > {data.num} </MenuItem>
         ))}</Select>
     );
 }
@@ -63,6 +65,7 @@ const validationSchema = Yup.object().shape({
         .email("Not a valid email")
 })
 function RegisterForm(){
+    const history = useHistory();
     return(
         <Formik
             initialValues = {{
@@ -70,7 +73,6 @@ function RegisterForm(){
                 password: "",
                 name: "", 
                 surname: "",
-                
                 email: "", 
                 gender: "male", 
                 age: "18"
@@ -88,8 +90,8 @@ function RegisterForm(){
                     body: JSON.stringify(values)
                 };
                 try{
-                    await fetch('http://localhost:3000/register', sendData);
-                    console.log("done");
+                    await fetch('https://server-social.herokuapp.com/register', sendData)
+                        .then(history.push("/signin"))
                 }
                 catch(err){
                     console.log(err.message);
@@ -119,7 +121,7 @@ function RegisterForm(){
                             />
                         </Grid>
                     </Grid>
-                    <Grid style={{width:"100%"}} item xs={12}>
+                    <Grid className="fullwidth" item xs={12}>
                         <MyTextInput
                             name="username" 
                             type="text" 
@@ -127,7 +129,7 @@ function RegisterForm(){
                             label="Username"
                         />
                     </Grid>
-                    <Grid style={{width:"100%"}} item xs={12}>
+                    <Grid className="fullwidth" item xs={12}>
                         <MyTextInput
                             name="email" 
                             type="email" 
@@ -135,7 +137,7 @@ function RegisterForm(){
                             label="E-Mail"
                         />
                     </Grid>
-                    <Grid style={{width:"100%"}} item xs={12}>
+                    <Grid className="fullwidth" item xs={12}>
                         <MyTextInput
                             name="password" 
                             type="password" 

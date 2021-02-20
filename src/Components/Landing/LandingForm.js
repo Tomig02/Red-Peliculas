@@ -1,7 +1,10 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {TextField, Button, Grid} from '@material-ui/core';
 import {useField, Formik, Form} from "formik";
 import * as Yup from "yup";
+import {useHistory} from "react-router-dom";
+
+
 
 // simple required fields, probalby needs more robust check
 const validationSchema = Yup.object().shape({
@@ -16,14 +19,24 @@ const validationSchema = Yup.object().shape({
 const MyTextInput = (props) => {
     const[field, meta] = useField(props);
     const errorText = meta.error && meta.touched? meta.error : "";
-    return <TextField {...field} label={props.label} variant={props.variant} helperText={errorText} error={!!errorText}/>
+    return(
+        <TextField 
+            {...field} 
+            label={props.label} 
+            variant={props.variant} 
+            helperText={errorText} 
+            error={!!errorText}
+            size = "small"    
+        />);
 }
 
 function LandingForm(props){
+    const history = useHistory();
+
     return(
         <Formik 
-            initialValues={{username:"", password:""}}
-            onSubmit={( async (data, actions) =>{
+            initialValues={{username:"", password:"", message:""}}
+            onSubmit={( (data, actions) =>{
                 actions.setSubmitting(true);
                 // start fetch user data
 
@@ -36,14 +49,22 @@ function LandingForm(props){
                     body: JSON.stringify(data)
                 };
                 try{
-                    const response = await fetch('http://localhost:3000/login', requestOptions);
-                    if(!response.ok) throw Error(response.statusText)
-                    const content = await response.json();
-
-                    console.log(content);
+                    fetch('https://server-social.herokuapp.com/login', requestOptions)
+                        .then(response => {
+                            if(!response.ok) Error(response.statusText)
+                            return response.json();
+                        })
+                        .then(content => {
+                            if(!content.message){
+                                props.handleUser(content);
+                                history.push("/")
+                            }else{
+                                data.message = content.message;
+                            }
+                        })
                 }
                 catch(err){
-                    console.log(err.message)
+                    alert(err.message);
                 }
                 finally{
                     actions.setSubmitting(false);
@@ -52,7 +73,7 @@ function LandingForm(props){
             })}
             validationSchema = {validationSchema}
         >   
-            {({isSubmitting}) => (
+            {({values, isSubmitting}) => (
                 <Form className="form">
                     <Grid container spacing={2} direction="column" className="center">
                         <Grid item xs={12}>
@@ -79,6 +100,7 @@ function LandingForm(props){
                                 type="submit"
                             >INGRESAR</Button>
                         </Grid>
+                        <div className="text">{values.message}</div>
                     </Grid>
                 </Form>
 
