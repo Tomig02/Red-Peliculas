@@ -2,6 +2,7 @@ import React from "react";
 import {TextField, Button, FormControlLabel, Radio, Grid, Select, MenuItem} from '@material-ui/core';
 import {useField, Formik, Form} from "formik";
 import * as Yup from "yup";
+import {useHistory} from "react-router-dom";
 
 const MyTextInput = (props) => {
     const[field, meta] = useField(props);
@@ -9,112 +10,126 @@ const MyTextInput = (props) => {
     return (
         <TextField 
             {...field}
-            type={props.type} 
-            label={props.label} 
-            variant={props.variant} 
-            helperText={errorText} 
-            error={!!errorText}
-            color="primary"
-            style={{width:"100%"}}
+            type = {props.type} 
+            label = {props.label} 
+            variant = {props.variant}
+            size = "small"
+            helperText = {errorText} 
+            error = {!!errorText}
+            color = "primary"
+            style = {{width:"100%"}}
         />);
 }
 
 const MyBulletInput = (props) => {
-    const [field, meta] = useField(props);
-    const errorText = meta.error && meta.touched? meta.error : "";
+    const [field] = useField(props);
     return(
         <FormControlLabel 
             {...field} 
-            control={<Radio color="primary"/>} 
-            label={props.label}
-            helperText={errorText} 
-            error={!!errorText}  
+            control = {<Radio color="primary"/>} 
+            label = {props.label}
         />
     );
 }
 
 const MySelectInput = (props) => {
-    const[field, meta] = useField(props);
-    const errorText = meta.error && meta.touched? meta.error : "";
-    
-    let array=[];
+    const [field] = useField(props);
+
+    const array=[];
     for (var i = 0; i < props.options && i < 100; i++) {
         array.push({num: props.options - i, key: Math.random()});
-        
     }
+
     return(
         <Select {...field} 
-            
-            variant="outlined" 
-            style={{width:"100%"}}
+            variant = "outlined" 
+            style = {{width:"100%"}}
         >{   
             array.map( data => (
-            <MenuItem key={data.key} value={data.num} > {data.num} </MenuItem>
+            <MenuItem key = {data.key} value = {data.num} > {data.num} </MenuItem>
         ))}</Select>
     );
 }
 
 const validationSchema = Yup.object().shape({
 
-    nombre: Yup.string()
+    name: Yup.string()
         .required("Name is required"),
 
-    apellido: Yup.string()
+    surname: Yup.string()
         .required("Surname is required"),
-
+    username: Yup.string()
+        .required("Username is required"),
     email: Yup.string()
         .required("Email is required")
-        .email("Not a valid email"),
-
-    gender: Yup.string()
-        .required("Gender is required"),
-
-    birth: Yup.object().shape({
-        day: Yup.string()
-            .required("Gender is required"),
-        month:  Yup.string()
-            .required("Gender is required"),
-        year:   Yup.string()
-            .required("Gender is required"),
-    })
+        .email("Not a valid email")
 })
 function RegisterForm(){
+    const history = useHistory();
     return(
         <Formik
             initialValues = {{
-                nombre:"", 
-                apellido:"", 
-                email:"", 
-                gender:"male", 
-                age:"18"
+                username: "",
+                password: "",
+                name: "", 
+                surname: "",
+                email: "", 
+                gender: "male", 
+                age: "18"
             }}
             validationSchema = {validationSchema}
-            onSubmit = { ((values, actions) => {
+            onSubmit = { async (values, actions) => {
+                
                 actions.setSubmitting(true);
-                actions.setSubmitting(false)
-            }) }
+
+                const myHeaders = new Headers();
+                myHeaders.append('Content-Type', 'application/json');
+                const sendData = {
+                    method: "POST",
+                    headers: myHeaders,
+                    body: JSON.stringify(values)
+                };
+                try{
+                    await fetch('https://server-social.herokuapp.com/register', sendData)
+                        .then(history.push("/signin"))
+                }
+                catch(err){
+                    console.log(err.message);
+                }
+                finally{
+                    actions.setSubmitting(false);
+                }
+            } }
         >{(values, isSubmitting) => (
             <Form>
                 <Grid container spacing={2} direction="column" className="center">
                     <Grid item container spacing={2} className="center">
                         <Grid item xs={6}>
                             <MyTextInput
-                                name="nombre" 
+                                name="name" 
                                 type="text" 
                                 variant="outlined" 
-                                label="Nombre"
+                                label="Name"
                             />
                         </Grid>
                         <Grid item xs={6}>
                             <MyTextInput
-                                name="apellido" 
+                                name="surname" 
                                 type="text" 
                                 variant="outlined" 
-                                label="Apellido"
+                                label="Surname"
                             />
                         </Grid>
                     </Grid>
-                    <Grid style={{width:"100%"}} item xs={12}>
+                    <Grid className="fullwidth" item xs={12}>
+                        <MyTextInput
+                            name="username" 
+                            type="text" 
+                            variant="outlined" 
+                            label="Username"
+                        />
+                    </Grid>
+                    <Grid className="fullwidth" item xs={12}>
                         <MyTextInput
                             name="email" 
                             type="email" 
@@ -122,8 +137,14 @@ function RegisterForm(){
                             label="E-Mail"
                         />
                     </Grid>
-
-                    
+                    <Grid className="fullwidth" item xs={12}>
+                        <MyTextInput
+                            name="password" 
+                            type="password" 
+                            variant="outlined" 
+                            label="Password"
+                        />
+                    </Grid>
                     <Grid item xs={12} container spacing={2}>
                         <Grid item xs={3}>
                             <div className="text">Age:</div>
@@ -154,16 +175,13 @@ function RegisterForm(){
                             />
                         </Grid>
                     </Grid>
-
-                    
-                    
                     <Grid item xs={12} className="center">
                         <Button 
                             type="submit" 
                             variant="contained" 
                             color="primary"
                             disabled={isSubmitting}
-                        >Submit</Button>
+                        >REGISTRARSE</Button>
                     </Grid>
                 </Grid>
             </Form>
