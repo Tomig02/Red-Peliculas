@@ -60,14 +60,12 @@ function LandingForm(props){
                                 history.push("/")
                             }else{
                                 data.message = content.message;
+                                actions.setSubmitting(false);
                             }
                         })
                 }
                 catch(err){
                     alert(err.message);
-                }
-                finally{
-                    actions.setSubmitting(false);
                 }
                 // end fetch user data
             })}

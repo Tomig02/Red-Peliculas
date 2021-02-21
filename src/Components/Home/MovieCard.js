@@ -1,14 +1,14 @@
 import React from "react";
-import {Grid, Card, CardActions, CardActionArea, Typography, CardContent, CardMedia, Button} from "@material-ui/core";
-import {} from "@material-ui/icons"
+import {Card, CardActions, CardActionArea, Typography, CardContent, CardMedia, IconButton} from "@material-ui/core";
+import {Favorite, AddCircle} from "@material-ui/icons"
 
 function MovieCard(props){
 
     const setDescription = () => {
         if( (!!props.description) && (props.description.length > 200) ){
-            return props.description.slice(0,200) + "...";
+            return props.description.slice(0,150) + "...";
         }else{
-            if(props.description === ""){
+            if( (!props.description) || (props.description === "") ){
                 return "There is no description"
             }
         }
@@ -16,10 +16,10 @@ function MovieCard(props){
     }
 
     return(
-        <Card key={props.keyCode}style={{width:"100%", height:"500px"}}>
+        <Card key={props.keyCode} className="movieCard">
             <CardActionArea>
                 <CardMedia
-                style={{height:"200px", backgroundColor:"lightgray"}}
+                style={{height:"200px", backgroundColor:"#f5f5f5"}}
                 image={"https://image.tmdb.org/t/p/original" + props.image}
                 />
                 <CardContent>
@@ -33,10 +33,9 @@ function MovieCard(props){
             </CardActionArea>
 
             <CardActions>
-
-                <Button size="small" color="primary">Like</Button>
-
-                <Button size="small" color="primary">Learn More</Button>
+                <IconButton size="small" color="secondary"> <Favorite /> </IconButton>
+                <IconButton size="small" color="primary"> <AddCircle/> </IconButton>
+                <div>Likes:</div>
             </CardActions>
         </Card>
     );
