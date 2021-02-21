@@ -3,7 +3,7 @@ import { IconButton, AppBar, Toolbar, Grid, Menu, MenuItem} from "@material-ui/c
 import {AccountCircle, Notifications} from "@material-ui/icons";
 import {useHistory} from "react-router-dom";
 
-import SearchField from "./Search";
+import SearchField from "./Components/Search";
 
 function TopBar(mainProps){
         // states for displayable menus
@@ -49,11 +49,6 @@ function TopBar(mainProps){
                             </Grid>
 
                             <Grid item xs={2}>
-
-                                <IconButton onClick={handleMenuOpen}>
-                                    <Notifications/>
-                                </IconButton>
-
                                 <IconButton onClick={handleMenuOpen}>
                                     <AccountCircle/>
                                 </IconButton>
