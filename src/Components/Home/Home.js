@@ -52,6 +52,7 @@ function HomePage(props){
         const num = parseInt(event.currentTarget.value);
         setPageNum(prevState => (prevState + num));
     }
+
     return(
         <div>
             <div style={{height:"100px"}}></div>

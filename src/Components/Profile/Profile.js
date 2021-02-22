@@ -1,5 +1,5 @@
 import React, {Suspense, useState} from "react";
-import {Grid, Typography, Paper, Avatar} from "@material-ui/core";
+import {Grid, Typography, Paper, Avatar, Button} from "@material-ui/core";
 
 import searchTmdbById from "./searchTmdbById";
 import MovieSimple from "./MovieSimple";
@@ -8,11 +8,11 @@ function Profile(props){
 
     // states for slicing the favorite movies array from min to max
     const [minSaved, setMinSaved] = useState(0);
-    const [maxSaved, setMaxSaved] = useState(2);
+    const [maxSaved, setMaxSaved] = useState(3);
 
     // states for slicing the saved movies array from min to max
     const [minFavorite, setMinFavorite] = useState(0);
-    const [maxFavorite, setMaxFavorite] = useState(2);
+    const [maxFavorite, setMaxFavorite] = useState(3);
 
     const [saved, setSaved] = useState([]);
     const [favorites, setFavorites] = useState([]);
@@ -20,12 +20,12 @@ function Profile(props){
     React.useEffect( async () => {
         const data = await searchMovieById(props.userInfo.savedMovies, true);
         setSaved(data);
-    },[minSaved, maxSaved])
+    },[minSaved])
     
     React.useEffect( async () => {
         const data = await searchMovieById(props.userInfo.favoriteMovies, false);
         setFavorites(data);
-    },[minFavorite, maxFavorite])
+    },[minFavorite])
     
     
     const searchMovieById = async (array, category) => {
@@ -36,23 +36,35 @@ function Profile(props){
         slicedArray.forEach(id => {
             promise.push(
                 searchTmdbById(id)
-                    .then(movie => movieArray.push(movie))
+                    .then(movie => movie? movieArray.push(movie): null)
                     .catch(error => console.log(error.message))
             )
         });
         await Promise.all(promise);
 
+        if(!movieArray) return null; 
+
         return movieArray.map( data => {
             return(
                 <MovieSimple
                     data={{
-                        id: data.id,
+                        id: Math.random(),
                         image: data.poster_path,
                         title: data.title
                     }}
                 />
             );
         })
+    }
+
+    const handleClick = (next, minimum, maximum) => {
+        if(next){
+            minimum(prev => prev + 3);
+            maximum(prev => prev + 3);
+        }else{
+            minimum(prev => prev - 3);
+            maximum(prev => prev - 3); 
+        }
     }
 
     return(
@@ -104,6 +116,16 @@ function Profile(props){
                     <Grid container spacing={1} style={{minHeight: "300px"}}>
                         {favorites}
                     </Grid>
+                    <div>
+                        <Button 
+                            onClick={() => handleClick(false, setMinFavorite, setMaxFavorite)} 
+                            disabled={minFavorite === 0}
+                        >Prev</Button>
+                        <Button 
+                            onClick={() => handleClick(true, setMinFavorite, setMaxFavorite)} 
+                            disabled={maxFavorite > props.userInfo.favoriteMovies.length}
+                        >Next</Button>
+                    </div>
                 </Paper>
             </Grid>
             <Grid item xs={12}>
@@ -113,6 +135,16 @@ function Profile(props){
                     <Grid container spacing={1} style={{minHeight: "300px"}}>
                             {saved}      
                     </Grid>
+                    <div>
+                        <Button 
+                            onClick={() => handleClick(false, setMinSaved, setMaxSaved)}
+                            disabled={minSaved === 0}
+                        >Prev</Button>
+                        <Button 
+                            onClick={() => handleClick(true, setMinSaved, setMaxSaved)}
+                            disabled={maxSaved > props.userInfo.savedMovies.length}
+                        >Next</Button>
+                    </div>
                 </Paper> 
             </Grid>   
         </Grid>
