@@ -18,7 +18,6 @@ async function searchTmdbById(id){
         const request = await fetch(url , requestOptions);
         if(!request.ok) throw new Error("failed fetch");
         const content = await request.json();
-        console.log(content);
         return content;
     }
     catch(err){

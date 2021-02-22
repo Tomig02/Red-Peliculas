@@ -1,8 +1,8 @@
-import React, {useState} from "react";
-import {Grid, Typography, Paper, Avatar, Card, CardMedia, CardActions, CardContent} from "@material-ui/core";
+import React, {Suspense, useState} from "react";
+import {Grid, Typography, Paper, Avatar} from "@material-ui/core";
 
 import searchTmdbById from "./searchTmdbById";
-import MovieCard from "../Home/Components/MovieCard";
+import MovieSimple from "./MovieSimple";
 
 function Profile(props){
 
@@ -14,43 +14,43 @@ function Profile(props){
     const [minFavorite, setMinFavorite] = useState(0);
     const [maxFavorite, setMaxFavorite] = useState(2);
 
-    const searchMovieById = (data, category) => {
-        console.log("enter");
-        const slicedArray = category? data.slice(minSaved, maxSaved): data.slice(minFavorite, maxFavorite);
+    const [saved, setSaved] = useState([]);
+    const [favorites, setFavorites] = useState([]);
 
-        const array = [];
-        for(let i = 0; i < slicedArray.length; i++){
-            searchTmdbById(slicedArray[i])
-                .then(movie => array.push(movie))
-        }
-       console.log(array)
-        array.map((data) => {
+    React.useEffect( async () => {
+        const data = await searchMovieById(props.userInfo.savedMovies, true);
+        setSaved(data);
+    },[minSaved, maxSaved])
+    
+    React.useEffect( async () => {
+        const data = await searchMovieById(props.userInfo.favoriteMovies, false);
+        setFavorites(data);
+    },[minFavorite, maxFavorite])
+    
+    
+    const searchMovieById = async (array, category) => {
+        const slicedArray = category? array.slice(minSaved, maxSaved): array.slice(minFavorite, maxFavorite);
+
+        const movieArray = [];
+        const promise = [];
+        slicedArray.forEach(id => {
+            promise.push(
+                searchTmdbById(id)
+                    .then(movie => movieArray.push(movie))
+                    .catch(error => console.log(error.message))
+            )
+        });
+        await Promise.all(promise);
+
+        return movieArray.map( data => {
             return(
-                <Grid item xs={4} key={data.id}>
-                    <Card>
-                        <CardMedia
-                            style={{height:"200px", backgroundColor:"#f5f5f5"}}
-                            image={"https://image.tmdb.org/t/p/original" + data.image}
-                        />
-                        <CardContent>
-                            <Typography>{data.title}</Typography>
-                        </CardContent>
-                        <CardActions>
-
-                        </CardActions>
-                    </Card>
-                
-                    {/* <MovieCard 
-                        data={{
-                            title: data.title? data.title: data.name,
-                            image: data.poster_path? data.poster_path: data.profile_path,
-                            description: data.overview,
-                            rating: data.vote_average,
-                            date: data.release_date? data.release_date: "Not specified",
-                            keyCode: Math.random()
-                        }}
-                    /> */}
-                </Grid>
+                <MovieSimple
+                    data={{
+                        id: data.id,
+                        image: data.poster_path,
+                        title: data.title
+                    }}
+                />
             );
         })
     }
@@ -64,33 +64,33 @@ function Profile(props){
                     <Grid container spacing={4} direction="row">
                         <Grid item xs={2} className="center">
                             <Avatar style={{height:"10vw", width:"10vw"}}>
-                                R
+                                User
                             </Avatar>
                         </Grid>
                         <Grid item xs={10}container spacing={4}>
                             { /* first row of data*/ }
                             <Grid item container className="center">
                                 <Grid item xs={4} >
-                                    <Typography>Username: {props.userInfo.username}</Typography>
+                                    <Typography><span className="text">Username: </span>{props.userInfo.username}</Typography>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <Typography>Name: {props.userInfo.name}</Typography>
+                                    <Typography><span className="text">Name: </span> {props.userInfo.name}</Typography>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <Typography>Surname: {props.userInfo.surname}</Typography>
+                                    <Typography><span className="text">Surname: </span> {props.userInfo.surname}</Typography>
                                 </Grid>
                             </Grid>
 
                             { /* second row of data*/ }
                             <Grid item container>
                                 <Grid item xs={4}>
-                                    <Typography>Email: {props.userInfo.Email}</Typography>
+                                    <Typography><span className="text">Email: </span> {props.userInfo.email}</Typography>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <Typography>Gender: {props.userInfo.gender}</Typography>
+                                    <Typography><span className="text">Gender: </span> {props.userInfo.gender}</Typography>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <Typography>Age: {props.userInfo.age}</Typography>
+                                    <Typography><span className="text">Age: </span> {props.userInfo.age}</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>    
@@ -101,8 +101,8 @@ function Profile(props){
                 <Paper className="fullwidth" style={{padding:"1vw"}}>
                     <h2 className="text">Favorite</h2>
                     <hr/>
-                    <Grid container style={{minHeight: "300px"}}>
-                        {props.userInfo.favoriteMovies? searchMovieById(props.userInfo.favoriteMovies): null}
+                    <Grid container spacing={1} style={{minHeight: "300px"}}>
+                        {favorites}
                     </Grid>
                 </Paper>
             </Grid>
@@ -110,8 +110,8 @@ function Profile(props){
                 <Paper className="fullwidth" style={{padding:"1vw"}}>
                     <h2 className="text">Saved</h2>
                     <hr/>
-                    <Grid container style={{minHeight: "400px"}}>
-                        {props.userInfo.savedMovies? searchMovieById(props.userInfo.savedMovies): null}
+                    <Grid container spacing={1} style={{minHeight: "300px"}}>
+                            {saved}      
                     </Grid>
                 </Paper> 
             </Grid>   
