@@ -1,15 +1,50 @@
 import React, { useState } from "react";
 import {Grid, Paper, Button} from "@material-ui/core"
-import {Link} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 
 import LandingForm from "./LandingForm";
 
 
 function Landing(props){
 
-    // check if no error
+    const history = useHistory();
+
+    // if user accesed to his account recently then login automatically
+    React.useEffect(() => {
+        
+        const userToken = localStorage.getItem("userToken");
+        if(userToken){
+            var myHeaders = new Headers();
+            myHeaders.append('Content-Type', 'application/json');
+
+            const requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify({
+                    id: userToken
+                })
+            };
+            try{
+                fetch("https://server-social.herokuapp.com/login", requestOptions)
+                    .then(response => {
+                        if(!response.ok) throw new Error("failed fetch");
+                        return response.json()
+                    })
+                    .then(response => props.setUserInfo(response))
+                    .then(() => {
+                        props.setIsLoggedIn(true);
+                        history.push("/");
+                    })
+            }catch(err){
+                alert(err.message);
+            }
+        }
+    },[])
+
     const handleUser = (fetchData) =>{
-        props.logInUser(fetchData);
+        props.setUserInfo(fetchData);
+        localStorage.setItem("userToken", fetchData._id)
+        props.setIsLoggedIn(true);
     }
 
     return(

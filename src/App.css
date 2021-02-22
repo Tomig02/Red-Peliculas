@@ -60,3 +60,20 @@ input{
     color: inherit;
     text-decoration: inherit;
 }
+.MuiCard-root{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.movieCard{
+    width: 100%;
+    min-height: 500px;
+}
+hr{
+    margin: 10px 0;
+}
+.side-btn{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
